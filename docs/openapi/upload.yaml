@@ -1,0 +1,50 @@
+swagger: "2.0"
+info:
+  version: "1.0.0"
+  title: "File Upload API"
+  description: "API to upload a file and gender information"
+paths:
+  /api/upload:
+    post:
+      summary: "Upload File and Gender Information"
+      consumes:
+        - "multipart/form-data"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "file"
+          in: "formData"
+          description: "Selected file data"
+          required: true
+          type: "file"
+        - name: "gender"
+          in: "formData"
+          description: "Gender information (Male or Female)"
+          required: true
+          type: "string"
+      responses:
+        200:
+          description: "Data received successfully"
+          schema:
+            $ref: "#/definitions/UploadResponse"
+        400:
+          description: "Bad Request - Missing file or gender information"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        500:
+          description: "Internal Server Error - Failed to upload the file"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+definitions:
+  UploadResponse:
+    type: "object"
+    properties:
+      fileUrl:
+        type: "string"
+      gender:
+        type: "string"
+  ErrorModel:
+    type: "object"
+    properties:
+      error:
+        type: "string"

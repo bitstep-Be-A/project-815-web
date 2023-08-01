@@ -13,6 +13,10 @@ export interface ButtonProps {
   theme?: Theme;
   value?: string;
   children?: React.ReactNode;
+  onClick?: (e?: React.MouseEvent) => void;
+  onDrop?: (e?: React.DragEvent) => void;
+  onDragOver?: (e?: React.DragEvent) => void;
+  onDragEnter?: (e?: React.DragEvent) => void;
 }
 
 const primaryStyle: React.CSSProperties = {
@@ -39,6 +43,10 @@ const Button: React.FC<ButtonProps> = (props) => {
         <button value={props.value}
           style={getButtonStyle(props.theme, props.style)}
           className={props.className}
+          onClick={(e) => props.onClick && props.onClick(e)}
+          onDrop={(e) => props.onDrop && props.onDrop(e)}
+          onDragOver={(e) => props.onDragOver && props.onDragOver(e)}
+          onDragEnter={(e) => props.onDragEnter && props.onDragEnter(e)}
         >
           {props.children}
         </button>
@@ -59,6 +67,10 @@ const Button: React.FC<ButtonProps> = (props) => {
         <button value={props.value}
           style={getButtonStyle(props.theme, props.style)}
           className={props.className}
+          onClick={(e) => props.onClick && props.onClick(e)}
+          onDrop={(e) => props.onDrop && props.onDrop(e)}
+          onDragOver={(e) => props.onDragOver && props.onDragOver(e)}
+          onDragEnter={(e) => props.onDragEnter && props.onDragEnter(e)}
         >
           {props.children}
         </button>
