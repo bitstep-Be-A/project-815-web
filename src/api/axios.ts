@@ -1,5 +1,5 @@
 import axios from 'axios';
 
 export const axiosInstance = axios.create({
-    baseURL: 'endpoint',
+  baseURL: process.env.REACT_APP_SDAPI_BASE_URL,
 });

@@ -1,14 +1,16 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 
 import { deepGray } from "../styles";
 import { getPublicUrl, classNames } from "../utils";
 import { axiosInstance } from "../api/axios";
+import { storage } from "../api/firebase";
 
 import { BaseLayout } from "../components/layout";
 import Button from "../components/Button";
 
-type GenderType = 'M' | 'F'
+type GenderType = 'M' | 'F';
 
 const Upload = (): JSX.Element => {
   const navigate = useNavigate();
@@ -17,6 +19,25 @@ const Upload = (): JSX.Element => {
 
   const [fileValue, setFileValue] = useState<File>();
   const [genderValue, setGenderValue] = useState<GenderType>('M');
+
+  const [loading, setLoading] = useState<boolean>(false);
+  const [progress, setProgress] = useState(0);
+  const [error, setError] = useState('');
+  const storageRef = useMemo(() => {
+    if (!fileValue) {
+      return ref(storage);
+    }
+    return ref(storage, `upload/${Date.now()}${fileValue.name}`);
+  }, [fileValue]);
+
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [encodedImage, setEncodedImage] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (error) {
+      // window.location.reload();
+    }
+  }, [error])
 
   const hiddenFileInputElement = useRef<HTMLInputElement>(null);
 
@@ -47,19 +68,81 @@ const Upload = (): JSX.Element => {
     value && setGenderValue(value as GenderType);
   };
 
-  const handleSubmit = async () => {
-    try {
-      // const response = await axiosInstance.post('/upload', {file: fileValue, gender: genderValue}, {
-      //   headers: {
-      //     'Content-Type': 'multipart/form-data',
-      //   }
-      // });
-      // console.log(response.data);
-      navigate('/result');
-    } catch (error) {
-      console.error('Error occurred:', error);
+  const uploadFile = useCallback(async (convertedEncodedImage: string) => {
+    const metadata = {
+      contentType: 'image/jpeg',
     }
-  }
+
+    const blobData = atob(convertedEncodedImage);
+    const arrayBuffer = new Uint8Array(new ArrayBuffer(blobData.length));
+    for (let i = 0; i < blobData.length; i++) {
+      arrayBuffer[i] = blobData.charCodeAt(i);
+    }
+    const blob = new Blob([arrayBuffer], { type: metadata.contentType });
+
+    const task = uploadBytesResumable(storageRef, blob, metadata);
+    task.on("state_changed",
+      (snapshot) => {
+        setProgress(
+          Math.round(
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+          )
+        );
+      },
+      (error) => {
+        const msg = 'Error during image upload: ' + error;
+        console.error(msg);
+        setError(msg);
+      },
+      () => {
+        getDownloadURL(task.snapshot.ref).then((url) => {
+          sessionStorage.setItem('converted', url);
+          setLoading(false);
+          navigate('/result');
+        });
+      });
+  }, [fileValue, storageRef]);
+
+  useEffect(() => {
+    convertImage();
+  }, [encodedImage]);
+
+  const convertImage = useCallback(async () => {
+    if (!encodedImage) { return }
+    try {
+      const response = await axiosInstance.post('/sdapi/v1/img2img', {
+        "init_images": [encodedImage],
+        "denoising_strength": 0.0,
+        "image_cfg_scale": 0
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+      const data = response.data;
+      uploadFile(data.images[0]);
+    } catch (error) {
+      const msg = 'Error occurred: ' + error;
+      console.error(msg);
+      setError(msg);
+    }
+  }, [encodedImage]);
+
+  const handleSubmit = useCallback(async () => {
+    if (!fileValue) {
+      const msg = 'Please select a file first'
+      console.error(msg);
+      setError(msg)
+      return;
+    }
+    setLoading(true);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64Encoded = reader.result?.toString() || null;
+      setEncodedImage(base64Encoded);
+    }
+    reader.readAsDataURL(fileValue);
+  }, [fileValue]);
 
   return (
     <BaseLayout
@@ -97,8 +180,13 @@ const Upload = (): JSX.Element => {
               <input type="radio" name="sex" value="F" checked={genderValue === 'F'} onChange={handleGenderChange} /> 여
             </label>
           </div>
-          <button className="w-48 py-3 bg-primary text-white text-xl rounded-lg" onClick={() => handleSubmit()}>
-            선택 완료
+          <button className={classNames(
+            "w-48 py-3 bg-primary text-white text-xl rounded-lg",
+            loading ? "opacity-70" : ""
+            )} onClick={() => handleSubmit()} disabled={loading}>
+            {
+              !loading ? "선택 완료" : "변환중입니다"
+            }
           </button>
         </section>
       </div>
