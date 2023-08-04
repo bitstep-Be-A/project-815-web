@@ -6,11 +6,50 @@ import { deepGray } from "../styles";
 import { getPublicUrl, classNames } from "../utils";
 import { axiosInstance } from "../api/axios";
 import { storage } from "../api/firebase";
+import { base64ToBlob, blobToBase64, sourceToBase64 } from "../utils/files.util";
 
 import { BaseLayout } from "../components/layout";
 import Button from "../components/Button";
 
+const ROOP_MODEL_PATH = "/home/ubuntu/stable-diffusion-webui/models/roop/inswapper_128.onnx";
+
 type GenderType = 'M' | 'F';
+
+interface FileData {
+  file?: File;
+  gender: GenderType;
+  personId?: number;
+}
+
+interface RoopImageSourceContext {
+  source: string;
+  config: {
+    faceIndex?: number;
+  }
+}
+
+const getRoopContext = (fileData: FileData, opt?: {faceIndex?: number}): RoopImageSourceContext => {
+  let faceIndex;
+  if (opt?.faceIndex) {
+    faceIndex = opt?.faceIndex;
+  } else {
+    faceIndex = Math.floor(Math.random() * 2);
+  }
+
+  if (fileData.personId) {
+    return {
+      source: getPublicUrl(`/stable-diffusion/${fileData.gender}${fileData.personId}-${faceIndex}.png`),
+      config: {
+        faceIndex
+      }
+    }
+  }
+
+  return {
+    source: getPublicUrl(`/stable-diffusion/${fileData.gender}G-${faceIndex}.png`),
+    config: {}
+  }
+}
 
 const Upload = (): JSX.Element => {
   const navigate = useNavigate();
@@ -30,12 +69,22 @@ const Upload = (): JSX.Element => {
     return ref(storage, `upload/${Date.now()}${fileValue.name}`);
   }, [fileValue]);
 
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [encodedImage, setEncodedImage] = useState<string | null>(null);
+
+  const fileData: FileData = useMemo(() => {
+    const personIdValue = sessionStorage.getItem('personId');
+    const personId = personIdValue ? Number(personIdValue) : undefined;
+    return {
+      file: fileValue,
+      gender: genderValue,
+      personId
+    }
+  }, [fileValue, genderValue])
 
   useEffect(() => {
     if (error) {
-      // window.location.reload();
+      alert('파일 업로드에 실패하였습니다.');
+      window.location.reload();
     }
   }, [error])
 
@@ -73,12 +122,7 @@ const Upload = (): JSX.Element => {
       contentType: 'image/jpeg',
     }
 
-    const blobData = atob(convertedEncodedImage);
-    const arrayBuffer = new Uint8Array(new ArrayBuffer(blobData.length));
-    for (let i = 0; i < blobData.length; i++) {
-      arrayBuffer[i] = blobData.charCodeAt(i);
-    }
-    const blob = new Blob([arrayBuffer], { type: metadata.contentType });
+    const blob = base64ToBlob(convertedEncodedImage);
 
     const task = uploadBytesResumable(storageRef, blob, metadata);
     task.on("state_changed",
@@ -103,18 +147,35 @@ const Upload = (): JSX.Element => {
       });
   }, [fileValue, storageRef]);
 
-  useEffect(() => {
-    convertImage();
-  }, [encodedImage]);
-
   const convertImage = useCallback(async () => {
     if (!encodedImage) { return }
+  
     try {
-      const response = await axiosInstance.post('/sdapi/v1/img2img', {
-        "init_images": [encodedImage],
+      const roopContext = getRoopContext(fileData);
+      const initImage = await sourceToBase64(roopContext.source);
+      const requestData = {
+        "init_images": [initImage],
         "denoising_strength": 0.0,
-        "image_cfg_scale": 0
-      }, {
+        "image_cfg_scale": 0,
+        "alwayson_scripts": {
+          "roop": {
+            "args": [
+              encodedImage, // imgBase64
+              true,  // enable
+              String(roopContext.config.faceIndex),  // face_index
+              ROOP_MODEL_PATH,  // model
+              "CodeFormer",  // face_restorer_name
+              1,  // face_restorer_visibility
+              null,  // upscaler_name
+              1,  // upscaler_scale
+              1,  // upscaler_visibility
+              false,  // swap_in_source
+              true  // swap_in_generated
+            ]
+          }
+        }
+      }
+      const response = await axiosInstance.post('/sdapi/v1/img2img', requestData, {
         headers: {
           'Content-Type': 'application/json',
         }
@@ -126,7 +187,7 @@ const Upload = (): JSX.Element => {
       console.error(msg);
       setError(msg);
     }
-  }, [encodedImage]);
+  }, [encodedImage, fileData]);
 
   const handleSubmit = useCallback(async () => {
     if (!fileValue) {
@@ -136,13 +197,15 @@ const Upload = (): JSX.Element => {
       return;
     }
     setLoading(true);
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const base64Encoded = reader.result?.toString() || null;
-      setEncodedImage(base64Encoded);
-    }
-    reader.readAsDataURL(fileValue);
+    blobToBase64(fileValue)
+      .then((base64) => {
+        setEncodedImage(base64);
+      });
   }, [fileValue]);
+
+  useEffect(() => {
+    convertImage();
+  }, [encodedImage, convertImage]);
 
   return (
     <BaseLayout

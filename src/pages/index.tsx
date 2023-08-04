@@ -6,7 +6,7 @@ import { BaseLayout } from "../components/layout";
 import Tab from "../components/Tab";
 import Button from "../components/Button";
 
-const Landing = (): JSX.Element => {
+const Home = (): JSX.Element => {
   return (
     <BaseLayout
       titleName="독립운동가와 함께 인생샷 남기기"
@@ -95,4 +95,4 @@ const Landing = (): JSX.Element => {
   );
 }
 
-export default Landing;
+export default Home;

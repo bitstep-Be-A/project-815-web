@@ -1,1 +1,1 @@
-export type Theme = 'primary' | undefined;
+export type Theme = 'primary' | 'gb-blue' | 'gb-red' | 'gb-purple' | undefined;

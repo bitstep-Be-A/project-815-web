@@ -2,7 +2,10 @@ import { Link } from "react-router-dom";
 
 import {
   Theme,
-  primaryColor
+  primaryColor,
+  gbBlue,
+  gbRed,
+  gbPurple
 } from "../styles";
 
 export interface ButtonProps {
@@ -24,6 +27,21 @@ const primaryStyle: React.CSSProperties = {
   backgroundColor: primaryColor
 }
 
+const gbBlueStyle: React.CSSProperties = {
+  color: 'white',
+  backgroundColor: gbBlue
+}
+
+const gbRedStyle: React.CSSProperties = {
+  color: 'white',
+  backgroundColor: gbRed
+}
+
+const gbPurpleStyle: React.CSSProperties = {
+  color: 'white',
+  backgroundColor: gbPurple
+}
+
 export const getButtonStyle = (theme: Theme, style?: React.CSSProperties) => {
   switch(theme) {
     case 'primary':
@@ -31,6 +49,21 @@ export const getButtonStyle = (theme: Theme, style?: React.CSSProperties) => {
         ...primaryStyle,
         ...style
       };
+    case 'gb-blue':
+      return {
+        ...gbBlueStyle,
+        ...style
+      }
+    case 'gb-red':
+      return {
+        ...gbRedStyle,
+        ...style
+      }
+    case 'gb-purple':
+      return {
+        ...gbPurpleStyle,
+        ...style
+      }
     default:
       return style;
   }
