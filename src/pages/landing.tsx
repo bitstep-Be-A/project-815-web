@@ -1,3 +1,5 @@
+import { useContext } from "react";
+
 import { classNames, getPublicUrl } from "../utils";
 import {
   screenWidthClassName,
@@ -41,7 +43,7 @@ const SubTitle = ({children, className}: {
 }
 
 const Page = () => {
-  const router = usePopupRouter();
+  const router = useContext(PopupContext);
 
   return (
     <div className={classNames(
