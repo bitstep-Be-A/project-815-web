@@ -18,19 +18,12 @@ export const usePeople = (): DataController<undefined, PersonVO> => {
         .then((data: PersonVO[]) => {
           setItems(data);
           setResponseState({
-            ...responseState,
             loading: false,
             fetched: false
           })
         });
-    } else {
-      setResponseState({
-        ...responseState,
-        loading: true,
-        fetched: true
-      })
     }
-  }, [responseState, router]);
+  }, [router]);
 
   async function add() {};
   async function modify() {};

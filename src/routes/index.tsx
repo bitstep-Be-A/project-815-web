@@ -13,6 +13,7 @@ import People from "./People";
 import Upload from "./Upload";
 import Result from "./Result";
 import Landing from "./Landing";
+import Loading from "./Loading";
 
 const Layout = ({children}: {children: React.ReactNode}) => {
   const router = useContext(RouterContext);
@@ -39,6 +40,7 @@ const Layout = ({children}: {children: React.ReactNode}) => {
           "w-full h-full",
           addNavigateAnimation(router),
         )}>
+          <h1 className="hidden">광복절 이벤트</h1>
           {children}
         </div>
       </div>
@@ -67,16 +69,16 @@ const RouteElement = () => {
             <People/>
           </Layout>
         )
-      case 'result':
-        return (
-          <Layout>
-            <Result/>
-          </Layout>
-        );
       case 'upload':
         return (
           <Layout>
             <Upload/>
+          </Layout>
+        );
+      case 'loading':
+        return (
+          <Layout>
+            <Loading/>
           </Layout>
         );
       default:
@@ -90,6 +92,11 @@ const RouteElement = () => {
     <BrowserRouter>
       <Routes>
         <Route path={"/"} element={element}/>
+        <Route path={"/:imageId"} element={
+          <Layout>
+            <Result/>
+          </Layout>
+        }/>
       </Routes>
     </BrowserRouter>
   )

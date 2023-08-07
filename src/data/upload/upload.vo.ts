@@ -19,7 +19,7 @@ export const ReservedImageResponseState = atom<ResponseState<ReservedImageVO>>({
 });
 
 export interface ConvertedImageVO {
-  readonly images: string[];
+  readonly base64Images: string[];
   readonly parameters: object;
   readonly info: string;
 }
@@ -29,5 +29,19 @@ export const ConvertedImageResponseState = atom<ResponseState<ConvertedImageVO>>
   default: {
     loading: false,
     fetched: false,
+  }
+});
+
+export interface StoredImageVO {
+  readonly id: string;
+  readonly url: string;
+  readonly created?: number;
+}
+
+export const StoredImageResponseState = atom<ResponseState<StoredImageVO>>({
+  key: "atom/StoredImage",
+  default: {
+    loading: true,
+    fetched: false
   }
 });

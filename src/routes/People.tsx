@@ -1,11 +1,16 @@
 import { useContext, useMemo, useState } from "react";
+import { useRecoilState } from "recoil";
 
 import { RouterContext } from "../utils/router.util";
 import { usePeople } from "../controllers/people.controller";
 import { classNames, getPublicUrl } from "../utils";
+import { ImageFileDtoState } from "../data/upload/upload.dto";
 
 import Button from "../components/Button";
-import { subTitleClassName } from "../styles/className";
+import {
+  subTitleClassName,
+  contentContainerClassName
+} from "../styles/className";
 
 const incluedPeople = [
   1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 18, 19, 20, 21, 22, 23, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 39, 41, 42, 44, 45, 46, 47, 48
@@ -15,24 +20,31 @@ export default function People() {
   const router = useContext(RouterContext);
 
   const {items} = usePeople();
+  const [imageFileDto, setImageFileDto] = useRecoilState(ImageFileDtoState);
 
   const people = useMemo(() => items.filter((person) => incluedPeople.includes(person.id)), [items]);
   const [currentId, setCurrentId] = useState<number>(1);
   const targetPerson = useMemo(() => people.find(v => v.id === currentId), [currentId, people]);
 
   return (
-    <div className="w-full h-full pt-16 sm:px-24 px-8">
+    <div className={contentContainerClassName}>
       <div className="w-full flex justify-center">
-        <h1 className={classNames(
+        <h2 className={classNames(
           subTitleClassName,
           "my-4"
-        )}>독립운동가를 골라주세요</h1>
+        )}>독립운동가를 골라주세요</h2>
       </div>
       <div>
         <div className="w-full flex flex-row justify-between items-center">
-          <h2 className="text-lg sm:text-xl">{targetPerson?.name}</h2>
+          <h3 className="text-lg sm:text-xl">{targetPerson?.name}</h3>
           <Button className="text-gb-purple underline"
-            onClick={() => router.push("upload")}
+            onClick={() => {
+              setImageFileDto({
+                ...imageFileDto,
+                personId: targetPerson?.id ?? 0
+              });
+              router.push("upload");
+            }}
           >
             선택하기
           </Button>

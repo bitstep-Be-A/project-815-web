@@ -73,16 +73,18 @@ export default function Landing() {
             </div>
             <h1 className="xl:text-7xl sm:text-5xl text-4xl text-gb-blue pt-2 sm:pt-4 mb-8 sm:mb-16">광복절 이벤트</h1>
             <div className={classNames(
-              "w-[350px] sm:w-[430px] text-center",
+              "w-[350px] sm:w-[450px] text-center",
               descriptionClassName
             )}>
               <p>독립유공자와 함께하는 815 광복절 사진 합성 이벤트!</p>
               <br/>
               <p>내 사진만 찍으면 독립유공자와 함께 인생 사진을 찍을 수 있다고?</p>
-              <p>이번 815 광복절을 더욱 특별한 방법으로 함께하세요!</p>
+              <p>독립운동가와 함께하는 815 광복절 셀카 찍기 이벤트!</p>
               <br/>
-              <p>참가자들이 본인의 사진을 등록하면 AI 사진 합성을 통해</p>
-              <p>독립운동가분들과 함께한 듯한 사진을 제공해 드립니다.</p>
+              <p>이번 815 광복절을 더욱 특별하게 기념하는 방법!</p>
+              <p>내 사진을 업로드 하면 AI 사진 합성을 통해</p>
+              <p>독립운동가분들과 함께 찍은 사진을 만들어드립니다.</p>
+              <p>위대한 그들이 나와 함께 활짝 웃는 순간, 그 감동을 영원히 간직하세요.</p>
             </div>
             <div className="flex flex-col items-center justify-center w-full h-full mt-12" style={{
               backgroundColor: 'rgba(195, 215, 228, 0.15)',
@@ -114,7 +116,7 @@ export default function Landing() {
             "text-[10px]"
           )}>
             <p>독립운동가들과 사진을 합성해서 공유하세요!</p>
-            <p>사진을 업로드하는 것은 서비스 약관 및 개인정보보호정책에 동의하는 것으로 간주합니다.</p>
+            <p>사진을 업로드하는 것은 서비스 약관 및 개인정보보호정책에 대한 동의임을 미리 알려드립니다.</p>
           </div>
         </section>
         <section className="w-full py-24 bg-black">

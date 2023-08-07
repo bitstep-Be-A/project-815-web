@@ -1,14 +1,18 @@
 import { useCallback, useEffect, useState, useContext } from "react";
 import { useRecoilState } from "recoil";
+import { doc, getDoc, collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 
 import { DataController } from "./types";
-import { ConvertedImageVO, ConvertedImageResponseState, ReservedImageVO, ReservedImageResponseState } from "../data/upload/upload.vo";
+import { ConvertedImageVO, ConvertedImageResponseState, ReservedImageVO, ReservedImageResponseState, StoredImageVO, StoredImageResponseState } from "../data/upload/upload.vo";
 import {
+  ConvertedImageDto,
   ImageFileDto,
 } from "../data/upload/upload.dto";
-import { blobToBase64, sourceToBase64 } from "../utils/files.util";
+import { base64ToBlob, blobToBase64, sourceToBase64 } from "../utils/files.util";
 import { axiosInstance } from "../api/axios";
 import { RouterContext } from "../utils/router.util";
+import { firebaseDB, storage } from "../api/firebase";
 
 export const useReservedImages = (): DataController<undefined, ReservedImageVO> => {
   const [items, setItems] = useState<ReservedImageVO[]>([]);
@@ -23,19 +27,12 @@ export const useReservedImages = (): DataController<undefined, ReservedImageVO> 
         .then((data: ReservedImageVO[]) => {
           setItems(data);
           setResponseState({
-            ...responseState,
             loading: false,
             fetched: false
           });
         });
-    } else {
-      setResponseState({
-        ...responseState,
-        loading: true,
-        fetched: true
-      })
     }
-  }, [responseState, router]);
+  }, [router]);
 
   async function add() {};
   async function modify() {};
@@ -55,15 +52,20 @@ export const useConvertedImage = (): DataController<ImageFileDto, ConvertedImage
 
   const { items: reservedImages } = useReservedImages();
 
+  const init = useCallback(() => {
+    setResponseState({
+      data: undefined,
+      loading: false,
+      fetched: false,
+      error: undefined
+    });
+  }, [setResponseState]);
+
   useEffect(() => {
     if (responseState.fetched) {
-      setResponseState({
-        data: undefined,
-        loading: false,
-        fetched: false,
-      });
+      init();
     }
-  }, [responseState]);
+  }, [responseState, init]);
   
   const add = useCallback(async (data: ImageFileDto) => {
     if (!data.file) { throw new Error("File이 업로드되지 않았습니다.") }
@@ -106,12 +108,18 @@ export const useConvertedImage = (): DataController<ImageFileDto, ConvertedImage
       }
     }).then((res) => res.data)
       .then((data) => {
-      setResponseState({
-        ...responseState,
-        data: data,
-        fetched: true
+        setResponseState({
+          ...responseState,
+          data: data,
+          fetched: true
+        });
+      })
+      .catch((error) => {
+        setResponseState({
+          ...responseState,
+          error
+        });
       });
-    });
   }, [responseState, reservedImages]);
 
   async function modify() {};
@@ -120,6 +128,117 @@ export const useConvertedImage = (): DataController<ImageFileDto, ConvertedImage
   return {
     dataState: responseState,
     items: [],
+    init,
+    add,
+    modify,
+    remove
+  }
+}
+
+export const useStoredImage = (id?: string): DataController<ConvertedImageDto, StoredImageVO> => {
+  const [items, setItems] = useState<StoredImageVO[]>([]);
+  const [responseState, setResponseState] = useRecoilState(StoredImageResponseState);
+
+  const [imageUrl, setImageUrl] = useState<string>("");
+
+  const init = useCallback(() => {
+    if (!id) {
+      setResponseState({
+        fetched: false,
+        loading: false
+      });
+      return;
+    }
+
+    const docRef = doc(firebaseDB, "images", id);
+    getDoc(docRef)
+      .then((snap) => {
+        if (!snap.exists()) {
+          setResponseState({
+            error: "Image not found",
+            data: undefined,
+            fetched: false,
+            loading: false
+          });
+        }
+        setResponseState({
+          data: snap.data() as StoredImageVO,
+          fetched: false,
+          loading: false
+        });
+      })
+      .catch(error => setResponseState({
+        error,
+        data: undefined,
+        fetched: false,
+        loading: false
+      }));
+  }, [setResponseState]);
+
+  useEffect(() => {
+    if (responseState.fetched) {
+      init();
+    }
+  }, [responseState]);
+
+  useEffect(() => {
+    addDoc(collection(firebaseDB, "images"), {
+      url: imageUrl,
+      created: serverTimestamp()
+    })
+      .then((docRef) => {
+        setResponseState({
+          data: {
+            id: docRef.id,
+            url: imageUrl,
+          },
+          fetched: false,
+          loading: false
+        })
+      });
+  }, [imageUrl]);
+
+  const uploadFile = useCallback(async (base64Image: string) => {
+    const storageRef = ref(storage, `upload/${Date.now()}${base64Image.slice(1, 10)}.png`);
+
+    const metadata = {
+      contentType: 'image/jpeg',
+    }
+
+    const blob = base64ToBlob(base64Image);
+
+    const task = uploadBytesResumable(storageRef, blob, metadata);
+    task.on("state_changed",
+      (snapshot) => {},
+      (error) => {
+        setResponseState({
+          error,
+          data: undefined,
+          fetched: false,
+          loading: false
+        });
+      },
+      () => {
+        getDownloadURL(task.snapshot.ref).then((url) => {
+          setImageUrl(url);
+        });
+      });
+  }, []);
+
+  const add = useCallback(async (data: ConvertedImageDto) => {
+    setResponseState({
+      ...responseState,
+      loading: true
+    });
+    uploadFile(data.base64Image);
+  }, [imageUrl]);
+
+  async function modify() {};
+  async function remove() {};
+
+  return {
+    items,
+    dataState: responseState,
     add,
     modify,
     remove

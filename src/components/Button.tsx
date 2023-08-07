@@ -16,6 +16,7 @@ export interface ButtonProps {
   theme?: Theme;
   value?: string;
   children?: React.ReactNode;
+  disabled?: boolean;
   onClick?: (e?: React.MouseEvent) => void;
   onDrop?: (e?: React.DragEvent) => void;
   onDragOver?: (e?: React.DragEvent) => void;
@@ -80,6 +81,7 @@ const Button: React.FC<ButtonProps> = (props) => {
           onDrop={(e) => props.onDrop && props.onDrop(e)}
           onDragOver={(e) => props.onDragOver && props.onDragOver(e)}
           onDragEnter={(e) => props.onDragEnter && props.onDragEnter(e)}
+          disabled={props.disabled}
         >
           {props.children}
         </button>
@@ -104,6 +106,7 @@ const Button: React.FC<ButtonProps> = (props) => {
           onDrop={(e) => props.onDrop && props.onDrop(e)}
           onDragOver={(e) => props.onDragOver && props.onDragOver(e)}
           onDragEnter={(e) => props.onDragEnter && props.onDragEnter(e)}
+          disabled={props.disabled}
         >
           {props.children}
         </button>

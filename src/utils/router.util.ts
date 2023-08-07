@@ -1,6 +1,6 @@
 import { createContext, useState, useCallback, useMemo } from "react";
 
-export type RouteType = "choice" | "upload" | "people" | "result" | null;
+export type RouteType = "choice" | "upload" | "people" | "loading" | null;
 
 export interface RouterStore {
   back: () => void;
