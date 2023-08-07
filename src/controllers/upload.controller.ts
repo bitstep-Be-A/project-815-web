@@ -182,20 +182,22 @@ export const useStoredImage = (id?: string): DataController<ConvertedImageDto, S
   }, [responseState]);
 
   useEffect(() => {
-    addDoc(collection(firebaseDB, "images"), {
-      url: imageUrl,
-      created: serverTimestamp()
-    })
-      .then((docRef) => {
-        setResponseState({
-          data: {
-            id: docRef.id,
-            url: imageUrl,
-          },
-          fetched: false,
-          loading: false
-        })
-      });
+    if (!!imageUrl) {
+      addDoc(collection(firebaseDB, "images"), {
+        url: imageUrl,
+        created: serverTimestamp()
+      })
+        .then((docRef) => {
+          setResponseState({
+            data: {
+              id: docRef.id,
+              url: imageUrl,
+            },
+            fetched: false,
+            loading: false
+          })
+        });
+    }
   }, [imageUrl]);
 
   const uploadFile = useCallback(async (base64Image: string) => {
