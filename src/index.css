@@ -109,3 +109,31 @@ code {
     display: none;
   }
 }
+
+/* CSS for sliding in animation */
+@keyframes slide-in {
+  from {
+    margin-left: 100%;
+  }
+  to {
+    margin-left: 0%;
+  }
+}
+
+/* CSS for sliding out animation */
+@keyframes slide-out {
+  from {
+    margin-left: -100%;
+  }
+  to {
+    margin-left: 0%;
+  }
+}
+
+.slide-in {
+  animation: 0.2s slide-in;
+}
+
+.slide-out {
+  animation: 0.2s slide-out;
+}
