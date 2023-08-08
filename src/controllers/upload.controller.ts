@@ -77,7 +77,10 @@ export const useConvertedImage = (): DataController<ImageFileDto, ConvertedImage
     
     const reservedImageData = reservedImages.find(v => v.personId === data.personId)!;
 
-    const initImage = sourceToBase64(reservedImageData.imageUrl ?? "");
+    const storageRef = ref(storage, reservedImageData.imageUrl);
+    const sourceUrl = await getDownloadURL(storageRef);
+
+    const initImage = sourceToBase64(sourceUrl);
     const base64Image = blobToBase64(data.file);
     const requestBody = {
       "init_images": [initImage],

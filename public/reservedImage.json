@@ -32,7 +32,7 @@
     "gender": "F",
     "myPosition": 1,
     "labelNum": 1,
-    "imageUrl": "/stable-diffusion/1-F-1-1.png"
+    "imageUrl": "/stable-diffusion/2-F-1-1.png"
   },
   {
     "personId": 2,
@@ -53,7 +53,7 @@
     "gender": "F",
     "myPosition": 1,
     "labelNum": 1,
-    "imageUrl": "/stable-diffusion/1-F-1-1.png"
+    "imageUrl": "/stable-diffusion/3-F-1-1.png"
   },
   {
     "personId": 3,
@@ -222,6 +222,13 @@
     "myPosition": 1,
     "labelNum": 1,
     "imageUrl": "/stable-diffusion/11-F-1-1.png"
+  },
+  {
+    "personId": 11,
+    "gender": "M",
+    "myPosition": 0,
+    "labelNum": 0,
+    "imageUrl": "/stable-diffusion/11-M-0-0.png"
   },
   {
     "personId": 12,
@@ -425,6 +432,13 @@
     "myPosition": 1,
     "labelNum": 1,
     "imageUrl": "/stable-diffusion/26-F-1-1.png"
+  },
+  {
+    "personId": 26,
+    "gender": "M",
+    "myPosition": 0,
+    "labelNum": 0,
+    "imageUrl": "/stable-diffusion/26-M-0-0.png"
   },
   {
     "personId": 27,
@@ -716,9 +730,9 @@
   {
     "personId": 44,
     "gender": "M",
-    "myPosition": 1,
-    "labelNum": 1,
-    "imageUrl": "/stable-diffusion/44-M-1-1.png"
+    "myPosition": 0,
+    "labelNum": 0,
+    "imageUrl": "/stable-diffusion/44-M-0-0.png"
   },
   {
     "personId": 45,
@@ -760,7 +774,7 @@
     "gender": "M",
     "myPosition": 0,
     "labelNum": 0,
-    "imageUrl": "/stable-diffusion/46-F-0-0.png"
+    "imageUrl": "/stable-diffusion/46-M-0-0.png"
   },
   {
     "personId": 47,
