@@ -96,7 +96,7 @@ export default function Landing() {
             </div>
           </div>
         </section>
-        <section className="w-full h-fit pt-20 md:pt-24">
+        <section className="w-full h-fit flex flex-col items-center pt-20 md:pt-24">
           <div className="w-full flex flex-col items-center mb-16 md:mb-20 space-y-8">
             <p className="text-gb-purple text-lg">인스타그램에 나의 사진을 공유하세요</p>
             <Button
@@ -107,11 +107,11 @@ export default function Landing() {
               공유하기
             </Button>
           </div>
-          <div className="w-full">
-            <img src={getPublicUrl("/images/landing/share.png")} alt="share" className="w-full" />
+          <div>
+            <img src={getPublicUrl("/images/landing/share.png")} alt="share" />
           </div>
           <div className={classNames(
-            "flex flex-col md:space-y-3 px-2 sm:px-4 py-2 sm:py-4 bg-gb-purple text-white",
+            "w-full flex flex-col md:space-y-3 px-2 sm:px-4 py-2 sm:py-4 bg-gb-purple text-white",
             descriptionClassName,
             "text-[10px]"
           )}>
