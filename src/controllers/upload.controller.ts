@@ -97,7 +97,7 @@ export const useConvertedImage = (): DataController<ImageFileDto, ConvertedImage
             base64Image, // imgBase64
             true,  // enable
             String(reservedImage.myPosition),  // face_index
-            "/home/ubuntu/stable-diffusion-webui/models/roop/inswapper_128.onnx",  // model
+            process.env.REACT_APP_MODEL_ROOT,  // model
             "CodeFormer",  // face_restorer_name
             1,  // face_restorer_visibility
             null,  // upscaler_name
