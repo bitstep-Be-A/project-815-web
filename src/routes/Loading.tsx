@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { useConvertedImage, useStoredImage } from "../controllers/upload.controller";
@@ -12,8 +12,6 @@ export default function Loading() {
 
   const { dataState: convertedImageDataState } = useConvertedImage();
   const { dataState: storedImageDataState, add: storeImage } = useStoredImage();
-
-  const [isButtonActive, setIsButtonActive] = useState(false);
 
   const isComplete = useMemo(() => {
     return (
@@ -30,18 +28,10 @@ export default function Loading() {
   }, [convertedImageDataState, storedImageDataState]);
 
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      setIsButtonActive(true);
-    }, 7000); // 30초
-
-    return () => clearTimeout(timeoutId);
-  }, []);
-
-  useEffect(() => {
     if (!convertedImageDataState.loading) {
       convertedImageDataState.data &&
         storeImage({
-          base64Image: convertedImageDataState.data.base64Images[0]
+          base64Image: convertedImageDataState.data.images[0]
         });
     }
   }, [convertedImageDataState, storeImage]);
@@ -63,23 +53,23 @@ export default function Loading() {
       <div className="absolute w-full h-full top-16 flex flex-col justify-center items-center z-50">
         {
           isFailure && (
+            <>
             <p className="font-pretendard underline text-gb-red text-sm">이미지 변환에 실패하였습니다</p>
+            <Button
+              className={classNames(
+                "flex flex-row space-x-2 items-center rounded-md px-4 py-1"
+              )}
+              theme={"gb-purple"}
+              onClick={() => {
+                navigate(0);
+              }}
+            >
+              <span>다시 시도하기</span>
+              <CachedIcon></CachedIcon>
+            </Button>
+            </>
           )
         }
-        <Button
-          className={classNames(
-            !isButtonActive ? "opacity-50" : "",
-            "flex flex-row space-x-2 items-center rounded-md px-4 py-1"
-          )}
-          theme={"gb-purple"}
-          onClick={() => {
-            navigate(0);
-          }}
-          disabled={!isButtonActive}
-        >
-          <span>다시 시도하기</span>
-          <CachedIcon></CachedIcon>
-        </Button>
       </div>
     </>
   );

@@ -1,8 +1,8 @@
-import { useContext, useMemo } from "react";
+import { useContext, useMemo, useEffect } from "react";
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 import { RouterContext, useRouter } from "../utils/router.util";
-import { screenWidthClassName, addNavigateAnimation } from "../styles/className";
+import { screenWidthClassName } from "../styles/className";
 import { classNames } from "../utils";
 import Button from "../components/Button";
 import CloseIcon from '@mui/icons-material/Close';
@@ -17,6 +17,14 @@ import Loading from "./Loading";
 
 const Layout = ({children}: {children: React.ReactNode}) => {
   const router = useContext(RouterContext);
+
+  useEffect(() => {
+    router.setSlider(classNames(
+      router.action === "BACK" ? "slide-out" : "",
+      router.action === "PUSH" ? "slide-in" : "",
+    ));
+  }, [router]);
+  
   return (
     <div className={classNames(
       "w-screen h-screen flex flex-col items-center"
@@ -38,7 +46,7 @@ const Layout = ({children}: {children: React.ReactNode}) => {
         </div>
         <div className={classNames(
           "w-full h-full",
-          addNavigateAnimation(router),
+          router.slider,
         )}>
           <h1 className="hidden">광복절 이벤트</h1>
           {children}
@@ -93,9 +101,7 @@ const RouteElement = () => {
       <Routes>
         <Route path={"/"} element={element}/>
         <Route path={"/:imageId"} element={
-          <Layout>
-            <Result/>
-          </Layout>
+          <Result/>
         }/>
       </Routes>
     </BrowserRouter>

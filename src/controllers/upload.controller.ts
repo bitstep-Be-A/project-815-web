@@ -75,13 +75,18 @@ export const useConvertedImage = (): DataController<ImageFileDto, ConvertedImage
       loading: true
     });
     
-    const reservedImageData = reservedImages.find(v => v.personId === data.personId)!;
+    const tmp = reservedImages.filter(v => (v.personId === data.personId) && (v.gender === data.gender));
+    if (tmp.length === 0) {
+      throw new Error("reservedImage가 존재하지 않습니다.");
+    }
+    const reservedImage = tmp[Math.floor(Math.random() * tmp.length)];
 
-    const storageRef = ref(storage, reservedImageData.imageUrl);
+    const storageRef = ref(storage, reservedImage.imageUrl);
     const sourceUrl = await getDownloadURL(storageRef);
 
-    const initImage = sourceToBase64(sourceUrl);
-    const base64Image = blobToBase64(data.file);
+    const initImage = await sourceToBase64(sourceUrl);
+    const base64Image = await blobToBase64(data.file);
+
     const requestBody = {
       "init_images": [initImage],
       "denoising_strength": 0.0,
@@ -91,7 +96,7 @@ export const useConvertedImage = (): DataController<ImageFileDto, ConvertedImage
           "args": [
             base64Image, // imgBase64
             true,  // enable
-            String(reservedImageData.myPosition),  // face_index
+            String(reservedImage.myPosition),  // face_index
             "/home/ubuntu/stable-diffusion-webui/models/roop/inswapper_128.onnx",  // model
             "CodeFormer",  // face_restorer_name
             1,  // face_restorer_visibility
@@ -139,20 +144,14 @@ export const useConvertedImage = (): DataController<ImageFileDto, ConvertedImage
 }
 
 export const useStoredImage = (id?: string): DataController<ConvertedImageDto, StoredImageVO> => {
-  const [items, setItems] = useState<StoredImageVO[]>([]);
   const [responseState, setResponseState] = useRecoilState(StoredImageResponseState);
 
   const [imageUrl, setImageUrl] = useState<string>("");
 
   const init = useCallback(() => {
     if (!id) {
-      setResponseState({
-        fetched: false,
-        loading: false
-      });
       return;
     }
-
     const docRef = doc(firebaseDB, "images", id);
     getDoc(docRef)
       .then((snap) => {
@@ -179,7 +178,7 @@ export const useStoredImage = (id?: string): DataController<ConvertedImageDto, S
   }, [setResponseState]);
 
   useEffect(() => {
-    if (responseState.fetched) {
+    if (id) {
       init();
     }
   }, [responseState]);
@@ -211,7 +210,6 @@ export const useStoredImage = (id?: string): DataController<ConvertedImageDto, S
     }
 
     const blob = base64ToBlob(base64Image);
-
     const task = uploadBytesResumable(storageRef, blob, metadata);
     task.on("state_changed",
       (snapshot) => {},
@@ -233,7 +231,8 @@ export const useStoredImage = (id?: string): DataController<ConvertedImageDto, S
   const add = useCallback(async (data: ConvertedImageDto) => {
     setResponseState({
       ...responseState,
-      loading: true
+      loading: true,
+      fetched: false
     });
     uploadFile(data.base64Image);
   }, [imageUrl]);
@@ -242,7 +241,7 @@ export const useStoredImage = (id?: string): DataController<ConvertedImageDto, S
   async function remove() {};
 
   return {
-    items,
+    items: [],
     dataState: responseState,
     add,
     modify,

@@ -1,7 +1,6 @@
-import { useContext, useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 
-import { RouterContext } from "../utils/router.util";
-import { useConvertedImage } from "../controllers/upload.controller";
+import { useStoredImage } from "../controllers/upload.controller";
 import { classNames } from "../utils";
 import {
   subTitleClassName,
@@ -9,12 +8,9 @@ import {
 } from "../styles/className";
 
 export default function Result() {
-  const router = useContext(RouterContext);
+  const { imageId } = useParams();
 
-  const { dataState } = useConvertedImage();
-  useEffect(() => {
-
-  }, []);
+  const { dataState } = useStoredImage(imageId);
 
   return (
     <div className={contentContainerClassName}>
@@ -27,7 +23,13 @@ export default function Result() {
         </h2>
       </div>
       <div className="w-full h-full flex lg:flex-row flex-col items-center justify-center">
-        <img src={dataState.data?.base64Images[0]} alt="" />
+        {
+          !dataState.loading ? (
+            <img src={dataState.data?.url} alt={String(dataState.data?.created)} />
+          ) : (
+            "loading..."
+          )
+        }
       </div>
     </div>
   );

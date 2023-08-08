@@ -19,7 +19,7 @@ export const ReservedImageResponseState = atom<ResponseState<ReservedImageVO>>({
 });
 
 export interface ConvertedImageVO {
-  readonly base64Images: string[];
+  readonly images: string[];
   readonly parameters: object;
   readonly info: string;
 }
