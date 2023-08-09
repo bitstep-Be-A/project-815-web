@@ -54,8 +54,8 @@ export default function Result() {
       <div className="flex flex-col items-center justify-center">
         {
           (!dataState.loading && dataState.data) ? (
-            <div className="w-[350px] sm:w-[500px]">
-              <div className="w-full sm:h-[500px] h-[350px] bg-white">
+            <div className="w-[350px] sm:px-0 px-10">
+              <div className="w-full bg-white">
                 <img src={dataState.data.url} alt={String(dataState.data.created)} className="w-full h-full" />
               </div>
               <Share imageUrl={dataState.data.url}/>
