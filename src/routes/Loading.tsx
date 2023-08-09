@@ -1,8 +1,10 @@
 import { useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { useRecoilState } from "recoil";
 
 import { useConvertedImage, useStoredImage } from "../controllers/upload.controller";
 import { classNames } from "../utils";
+import { ImageFileDtoState } from "../data/upload/upload.dto";
 
 import Button from "../components/Button";
 import CachedIcon from '@mui/icons-material/Cached';
@@ -12,6 +14,8 @@ export default function Loading() {
 
   const { dataState: convertedImageDataState } = useConvertedImage();
   const { dataState: storedImageDataState, add: storeImage } = useStoredImage();
+
+  const [imageFileDto, _] = useRecoilState(ImageFileDtoState);
 
   const isComplete = useMemo(() => {
     return (
@@ -31,7 +35,8 @@ export default function Loading() {
     if (!convertedImageDataState.loading) {
       convertedImageDataState.data &&
         storeImage({
-          base64Image: convertedImageDataState.data.images[0]
+          base64Image: convertedImageDataState.data.images[0],
+          personId: imageFileDto.personId
         });
     }
   }, [convertedImageDataState, storeImage]);

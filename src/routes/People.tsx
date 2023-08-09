@@ -5,12 +5,10 @@ import { RouterContext } from "../utils/router.util";
 import { usePeople } from "../controllers/people.controller";
 import { classNames, getPublicUrl } from "../utils";
 import { ImageFileDtoState } from "../data/upload/upload.dto";
+import { contentContainerClassName } from "../styles/className";
 
 import Button from "../components/Button";
-import {
-  subTitleClassName,
-  contentContainerClassName
-} from "../styles/className";
+import { SubTitle } from "../components/Title";
 
 const incluedPeople = [
   1, 2, 3, 4, 5, 6, 22, 23
@@ -28,12 +26,9 @@ export default function People() {
 
   return (
     <div className={contentContainerClassName}>
-      <div className="w-full flex justify-center">
-        <h2 className={classNames(
-          subTitleClassName,
-          "my-4"
-        )}>독립운동가를 골라주세요</h2>
-      </div>
+      <SubTitle>
+        {"독립운동가를 골라주세요"}
+      </SubTitle>
       <div>
         <div className="w-full flex flex-row justify-between items-center">
           <h3 className="text-lg sm:text-xl">{targetPerson?.name}</h3>

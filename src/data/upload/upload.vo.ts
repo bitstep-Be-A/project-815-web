@@ -35,6 +35,7 @@ export const ConvertedImageResponseState = atom<ResponseState<ConvertedImageVO>>
 export interface StoredImageVO {
   readonly id: string;
   readonly url: string;
+  readonly personId?: number;
   readonly created?: number;
 }
 

@@ -14,38 +14,31 @@ import { deepGray } from "../styles";
 import { GenderType } from "../data/types";
 
 import Button from "../components/Button";
+import { SubTitle } from "../components/Title";
 
 const SectionHeader = ({ sessionNum }: {sessionNum: number}) => {
   return (
     <>
     {
       sessionNum === 1 && (
-        <div className="w-full flex justify-center">
-          <h2 className={classNames(
-            subTitleClassName,
-            "my-4"
-          )}>
-            업로드할 이미지를 선택해주세요
-          </h2>
-        </div>
+        <SubTitle>
+          {"업로드할 이미지를 선택해주세요"}
+        </SubTitle>
       )
     }
     {
       sessionNum === 2 && (
-        <div className="w-full flex flex-col items-center">
-          <h2 className={classNames(
-            subTitleClassName,
-            "my-4"
-          )}>
-            성별을 선택해주세요
-          </h2>
-          <div className={classNames(
-            descriptionClassName,
-            "absolute top-32"
-          )}>
-            <p>(본인 사진과 동일한 성별이 아닐 경우 이미지가 왜곡될 수 있습니다)</p>
-          </div>
+        <>
+        <SubTitle>
+          {"성별을 선택해주세요"}
+        </SubTitle>
+        <div className={classNames(
+          descriptionClassName,
+          "w-full flex justify-center"
+        )}>
+          <p>{"(본인 사진과 동일한 성별이 아닐 경우 이미지가 왜곡될 수 있습니다)"}</p>
         </div>
+        </>
       )
     }
     </>

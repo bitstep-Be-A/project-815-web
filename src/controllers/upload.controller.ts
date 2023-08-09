@@ -4,7 +4,14 @@ import { doc, getDoc, collection, addDoc, serverTimestamp } from "firebase/fires
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 
 import { DataController } from "./types";
-import { ConvertedImageVO, ConvertedImageResponseState, ReservedImageVO, ReservedImageResponseState, StoredImageVO, StoredImageResponseState } from "../data/upload/upload.vo";
+import {
+  ConvertedImageVO,
+  ConvertedImageResponseState,
+  ReservedImageVO,
+  ReservedImageResponseState,
+  StoredImageVO,
+  StoredImageResponseState
+} from "../data/upload/upload.vo";
 import {
   ConvertedImageDto,
   ImageFileDto,
@@ -147,6 +154,7 @@ export const useStoredImage = (id?: string): DataController<ConvertedImageDto, S
   const [responseState, setResponseState] = useRecoilState(StoredImageResponseState);
 
   const [imageUrl, setImageUrl] = useState<string>("");
+  const [personId, setPersonId] = useState<number>(0);
 
   const init = useCallback(() => {
     if (!id) {
@@ -181,28 +189,32 @@ export const useStoredImage = (id?: string): DataController<ConvertedImageDto, S
     if (id) {
       init();
     }
-  }, [responseState]);
+  }, []);
 
   useEffect(() => {
     if (!!imageUrl) {
       addDoc(collection(firebaseDB, "images"), {
         url: imageUrl,
-        created: serverTimestamp()
+        created: serverTimestamp(),
+        personId: personId
       })
         .then((docRef) => {
           setResponseState({
             data: {
               id: docRef.id,
               url: imageUrl,
+              personId: personId
             },
             fetched: false,
             loading: false
           })
         });
     }
-  }, [imageUrl]);
+  }, [imageUrl, personId]);
 
-  const uploadFile = useCallback(async (base64Image: string) => {
+  const uploadFile = useCallback(async (data: ConvertedImageDto) => {
+    const { base64Image, personId } = data;
+
     const storageRef = ref(storage, `upload/${Date.now()}${base64Image.slice(1, 10)}.png`);
 
     const metadata = {
@@ -224,6 +236,7 @@ export const useStoredImage = (id?: string): DataController<ConvertedImageDto, S
       () => {
         getDownloadURL(task.snapshot.ref).then((url) => {
           setImageUrl(url);
+          setPersonId(personId);
         });
       });
   }, []);
@@ -234,7 +247,7 @@ export const useStoredImage = (id?: string): DataController<ConvertedImageDto, S
       loading: true,
       fetched: false
     });
-    uploadFile(data.base64Image);
+    uploadFile(data);
   }, [imageUrl]);
 
   async function modify() {};

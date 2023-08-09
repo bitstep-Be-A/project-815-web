@@ -21,4 +21,5 @@ export const ImageFileDtoState = atom<ImageFileDto>({
 
 export interface ConvertedImageDto {
   base64Image: string;
+  personId: number;
 }
