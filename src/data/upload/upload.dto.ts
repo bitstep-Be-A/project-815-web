@@ -23,3 +23,9 @@ export interface ConvertedImageDto {
   base64Image: string;
   personId: number;
 }
+
+export interface RoopImg2imgDto {
+  base_image: string;
+  roop_image: string;
+  face_index: number;
+}

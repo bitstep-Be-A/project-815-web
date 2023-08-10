@@ -17,9 +17,9 @@ import {
   ImageFileDto,
 } from "../data/upload/upload.dto";
 import { base64ToBlob, blobToBase64, sourceToBase64 } from "../utils/files.util";
-import { axiosInstance } from "../api/axios";
 import { RouterContext } from "../utils/router.util";
 import { firebaseDB, storage } from "../api/firebase";
+import fetchPostImg2img from "../api/fetchPostImg2img";
 
 export const useReservedImages = (): DataController<undefined, ReservedImageVO> => {
   const [items, setItems] = useState<ReservedImageVO[]>([]);
@@ -92,49 +92,24 @@ export const useConvertedImage = (): DataController<ImageFileDto, ConvertedImage
     const sourceUrl = await getDownloadURL(storageRef);
 
     const initImage = await sourceToBase64(sourceUrl);
-    const base64Image = await blobToBase64(data.file);
+    const roopImage = await blobToBase64(data.file);
 
-    const requestBody = {
-      "init_images": [initImage],
-      "denoising_strength": 0.0,
-      "image_cfg_scale": 0,
-      "alwayson_scripts": {
-        "roop": {
-          "args": [
-            base64Image, // imgBase64
-            true,  // enable
-            String(reservedImage.myPosition),  // face_index
-            process.env.REACT_APP_MODEL_ROOT,  // model
-            "CodeFormer",  // face_restorer_name
-            1,  // face_restorer_visibility
-            null,  // upscaler_name
-            1,  // upscaler_scale
-            1,  // upscaler_visibility
-            false,  // swap_in_source
-            true  // swap_in_generated
-          ]
-        }
-      }
-    }
-    
-    axiosInstance.post('/sdapi/v1/img2img', requestBody, {
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    }).then((res) => res.data)
-      .then((data) => {
-        setResponseState({
-          ...responseState,
-          data: data,
-          fetched: true
-        });
-      })
-      .catch((error) => {
-        setResponseState({
-          ...responseState,
-          error
-        });
+    fetchPostImg2img({
+      base_image: initImage,
+      roop_image: roopImage,
+      face_index: reservedImage.myPosition
+    }).then((data) => {
+      setResponseState({
+        ...responseState,
+        data: data,
+        fetched: true
       });
+    }).catch((error) => {
+      setResponseState({
+        ...responseState,
+        error
+      });
+    });
   }, [responseState, reservedImages]);
 
   async function modify() {};

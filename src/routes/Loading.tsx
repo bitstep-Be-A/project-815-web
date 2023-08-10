@@ -35,7 +35,7 @@ export default function Loading() {
     if (!convertedImageDataState.loading) {
       convertedImageDataState.data &&
         storeImage({
-          base64Image: convertedImageDataState.data.images[0],
+          base64Image: convertedImageDataState.data.image,
           personId: imageFileDto.personId
         });
     }

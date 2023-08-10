@@ -19,9 +19,7 @@ export const ReservedImageResponseState = atom<ResponseState<ReservedImageVO>>({
 });
 
 export interface ConvertedImageVO {
-  readonly images: string[];
-  readonly parameters: object;
-  readonly info: string;
+  readonly image: string
 }
 
 export const ConvertedImageResponseState = atom<ResponseState<ConvertedImageVO>>({
