@@ -50,7 +50,7 @@ export default function People() {
           </div>
         </div>
       </div>
-      <ul className="w-full h-3/5 grid grid-cols-3 sm:grid-cols-4 xl:grid-cols-8 overflow-auto">
+      <ul className="w-full h-3/5 grid grid-cols-3 sm:grid-cols-4 xl:grid-cols-6 overflow-auto">
         {
           people.map((person, index) => (
             <Button
