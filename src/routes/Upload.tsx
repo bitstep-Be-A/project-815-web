@@ -6,7 +6,6 @@ import { ImageFileDtoState } from "../data/upload/upload.dto";
 import { useConvertedImage } from "../controllers/upload.controller";
 import {
   descriptionClassName,
-  subTitleClassName,
   contentContainerClassName
 } from "../styles/className";
 import { classNames, getPublicUrl } from "../utils";
@@ -125,7 +124,7 @@ export default function Upload() {
             <p>파일 선택 또는 드래그</p>
             <p>해주세요</p>
           </div>
-          <input type="file" className="hidden" accept=".jpg, .jpeg, .png" onChange={(e) => handleFileChange(e)} ref={hiddenFileInputElement} />
+          <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e)} ref={hiddenFileInputElement} />
         </Button>
       </section>
       <section className={classNames(

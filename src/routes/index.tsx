@@ -55,7 +55,7 @@ const RouteElement = () => {
     <BrowserRouter>
       <Routes>
         <Route path={"/"} element={element}/>
-        <Route path={"/:imageId"} element={
+        <Route path={"/result/:imageId"} element={
           <Result/>
         }/>
       </Routes>

@@ -4,111 +4,127 @@
     "gender": "F",
     "myPosition": 1,
     "labelNum": 0,
-    "imageUrl": "/stable-diffusion/1-F-1-0.png"
+    "category": "real",
+    "imageUrl": "/stable-diffusion/real/1-F-1-0.png"
   },
   {
     "personId": 1,
     "gender": "M",
     "myPosition": 1,
     "labelNum": 0,
-    "imageUrl": "/stable-diffusion/1-M-1-0.png"
+    "category": "real",
+    "imageUrl": "/stable-diffusion/real/1-M-1-0.png"
   },
   {
     "personId": 2,
     "gender": "F",
-    "myPosition": 1,
+    "myPosition": 0,
     "labelNum": 0,
-    "imageUrl": "/stable-diffusion/2-F-1-0.png"
+    "category": "real",
+    "imageUrl": "/stable-diffusion/real/2-F-0-0.png"
   },
   {
     "personId": 2,
     "gender": "M",
-    "myPosition": 0,
+    "myPosition": 1,
     "labelNum": 0,
-    "imageUrl": "/stable-diffusion/2-M-0-0.png"
+    "category": "real",
+    "imageUrl": "/stable-diffusion/real/2-M-1-0.png"
   },
   {
     "personId": 3,
     "gender": "F",
     "myPosition": 1,
     "labelNum": 0,
-    "imageUrl": "/stable-diffusion/3-F-1-0.png"
+    "category": "real",
+    "imageUrl": "/stable-diffusion/real/3-F-1-0.png"
   },
   {
     "personId": 3,
     "gender": "M",
-    "myPosition": 0,
+    "myPosition": 1,
     "labelNum": 0,
-    "imageUrl": "/stable-diffusion/3-M-0-0.png"
+    "category": "real",
+    "imageUrl": "/stable-diffusion/real/3-M-1-0.png"
   },
   {
     "personId": 4,
     "gender": "F",
-    "myPosition": 1,
+    "myPosition": 0,
     "labelNum": 0,
-    "imageUrl": "/stable-diffusion/4-F-1-0.png"
+    "category": "real",
+    "imageUrl": "/stable-diffusion/real/4-F-0-0.png"
   },
   {
     "personId": 4,
     "gender": "M",
     "myPosition": 0,
     "labelNum": 0,
-    "imageUrl": "/stable-diffusion/4-M-0-0.png"
+    "category": "real",
+    "imageUrl": "/stable-diffusion/real/4-M-0-0.png"
   },
   {
     "personId": 5,
     "gender": "F",
-    "myPosition": 1,
+    "myPosition": 0,
     "labelNum": 0,
-    "imageUrl": "/stable-diffusion/5-F-1-0.png"
+    "category": "real",
+    "imageUrl": "/stable-diffusion/real/5-F-0-0.png"
   },
   {
     "personId": 5,
     "gender": "M",
-    "myPosition": 0,
+    "myPosition": 1,
     "labelNum": 0,
-    "imageUrl": "/stable-diffusion/5-M-0-0.png"
+    "category": "real",
+    "imageUrl": "/stable-diffusion/real/5-M-1-0.png"
   },
   {
     "personId": 6,
     "gender": "F",
     "myPosition": 0,
     "labelNum": 0,
-    "imageUrl": "/stable-diffusion/6-F-0-0.png"
+    "category": "real",
+    "imageUrl": "/stable-diffusion/real/6-F-0-0.png"
   },
   {
     "personId": 6,
     "gender": "M",
     "myPosition": 0,
     "labelNum": 0,
-    "imageUrl": "/stable-diffusion/6-M-0-0.png"
+    "category": "real",
+    "imageUrl": "/stable-diffusion/real/6-M-0-0.png"
   },
   {
     "personId": 22,
     "gender": "F",
+    "myPosition": 1,
+    "labelNum": 0,
+    "category": "real",
+    "imageUrl": "/stable-diffusion/real/22-F-1-0.png"
+  },
+  {
+    "personId": 22,
+    "gender": "M",
     "myPosition": 0,
     "labelNum": 0,
-    "imageUrl": "/stable-diffusion/22-F-0-0.png"
-  },
-  {
-    "personId": 22,
-    "gender": "M",
-    "myPosition": 1,
-    "labelNum": 0,
-    "imageUrl": "/stable-diffusion/22-M-1-0.png"
+    "category": "real",
+    "imageUrl": "/stable-diffusion/real/22-M-0-0.png"
   },
   {
     "personId": 23,
     "gender": "F",
     "myPosition": 1,
     "labelNum": 0,
-    "imageUrl": "/stable-diffusion/23-F-1-0.png"
+    "category": "real",
+    "imageUrl": "/stable-diffusion/real/23-F-1-0.png"
   },
   {
     "personId": 23,
     "gender": "M",
-    "myPosition": 1,
+    "myPosition": 0,
     "labelNum": 0,
-    "imageUrl": "/stable-diffusion/23-M-1-0.png"
+    "category": "real",
+    "imageUrl": "/stable-diffusion/real/23-M-0-0.png"
   }
 ]

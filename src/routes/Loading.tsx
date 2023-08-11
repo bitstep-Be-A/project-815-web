@@ -44,7 +44,7 @@ export default function Loading() {
   useEffect(() => {
     if (isComplete) {
       const imageId = storedImageDataState.data?.id;
-      navigate(`/${imageId}`);
+      navigate(`/result/${imageId}`);
     }
   }, [isComplete, storedImageDataState]);
 

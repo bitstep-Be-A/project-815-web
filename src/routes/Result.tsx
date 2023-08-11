@@ -60,7 +60,11 @@ export default function Result() {
                 <img src={dataState.data.url} alt={String(dataState.data.created)} className="w-full h-full" />
               </div>
               <Share imageUrl={dataState.data.url}/>
-              <Button to={"/"} type="link" theme={"gb-purple"} className="my-2 sm:my-4 px-2 text-sm sm:text-base rounded-md">홈으로 가기</Button>
+              <Button theme={"gb-purple"} className="my-2 sm:my-4 px-2 text-sm sm:text-base rounded-md"
+                onClick={() => window.location.replace("/")}
+              >
+                홈으로 가기
+              </Button>
               <Description personId={dataState.data.personId}/>
             </div>
           ) : (

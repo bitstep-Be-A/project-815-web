@@ -7,6 +7,7 @@ export interface ReservedImageVO {
   readonly gender: GenderType;
   readonly myPosition: number;
   readonly labelNum: number;
+  readonly category?: "real" | "cartoon";
   readonly imageUrl: string;
 }
 
