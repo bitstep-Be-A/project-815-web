@@ -1,22 +1,22 @@
 import { useCallback, useEffect, useState, useContext } from "react";
 import { useRecoilState } from "recoil";
-import { doc, getDoc, collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { doc, getDoc, onSnapshot } from "firebase/firestore";
+import { ref, getDownloadURL } from "firebase/storage";
 
 import { DataController } from "./types";
 import {
-  ConvertedImageVO,
-  ConvertedImageResponseState,
   ReservedImageVO,
   ReservedImageResponseState,
   StoredImageVO,
-  StoredImageResponseState
+  StoredImageResponseState,
+  ImageProgressVO,
+  ImageProgressStatus,
 } from "../data/upload/upload.vo";
 import {
   ConvertedImageDto,
   ImageFileDto,
 } from "../data/upload/upload.dto";
-import { base64ToBlob, blobToBase64, sourceToBase64 } from "../utils/files.util";
+import { blobToBase64, sourceToBase64 } from "../utils/files.util";
 import { RouterContext } from "../utils/router.util";
 import { firebaseDB, storage } from "../api/firebase";
 import fetchPostImg2img from "../api/fetchPostImg2img";
@@ -54,10 +54,13 @@ export const useReservedImages = (): DataController<undefined, ReservedImageVO> 
   }
 }
 
-export const useConvertedImage = (): DataController<ImageFileDto, ConvertedImageVO> => {
-  const [responseState, setResponseState] = useRecoilState(ConvertedImageResponseState);
+export const useProcessImage = (): DataController<ImageFileDto, StoredImageVO> => {
+  const [responseState, setResponseState] = useRecoilState(StoredImageResponseState);
 
   const { items: reservedImages } = useReservedImages();
+
+  const [personId, setPersonId] = useState<number>(0);
+  const [imageProgressId, setImageProgressId] = useState<string | null>(null);
 
   const init = useCallback(() => {
     setResponseState({
@@ -73,6 +76,43 @@ export const useConvertedImage = (): DataController<ImageFileDto, ConvertedImage
       init();
     }
   }, [responseState, init]);
+
+  /**
+   * polling image progress
+   */
+  useEffect(() => {
+    if (imageProgressId === null) return;
+
+    const docRef = doc(firebaseDB, "imageProgress", imageProgressId);
+
+    const unsubscribe = onSnapshot(docRef, (snapshot) => {
+      const data = snapshot.data() as (ImageProgressVO | undefined);
+      if (data) {
+        if (data.status === ImageProgressStatus.ERROR) {
+          setResponseState({
+            loading: false,
+            fetched: false,
+            error: ImageProgressStatus.ERROR
+          });
+        }
+        if (data.status === ImageProgressStatus.SUCCESS) {
+          setResponseState({
+            data: {
+              id: imageProgressId,
+              url: data.imageUrl,
+              personId: personId,
+            },
+            loading: false,
+            fetched: false,
+          });
+        }
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [imageProgressId, personId]);
   
   const add = useCallback(async (data: ImageFileDto) => {
     if (!data.file) { throw new Error("File이 업로드되지 않았습니다.") }
@@ -81,6 +121,8 @@ export const useConvertedImage = (): DataController<ImageFileDto, ConvertedImage
       ...responseState,
       loading: true
     });
+
+    setPersonId(data.personId);
     
     const tmp = reservedImages.filter(v => (v.personId === data.personId) && (v.gender === data.gender));
     if (tmp.length === 0) {
@@ -94,22 +136,20 @@ export const useConvertedImage = (): DataController<ImageFileDto, ConvertedImage
     const initImage = await sourceToBase64(sourceUrl);
     const roopImage = await blobToBase64(data.file);
 
-    fetchPostImg2img({
-      base_image: initImage,
-      roop_image: roopImage,
-      face_index: reservedImage.myPosition
-    }).then((data) => {
-      setResponseState({
-        ...responseState,
-        data: data,
-        fetched: true
+    try {
+      const context = await fetchPostImg2img({
+        base_image: initImage,
+        roop_image: roopImage,
+        face_index: reservedImage.myPosition
       });
-    }).catch((error) => {
+      setImageProgressId(context.id);
+    } catch(error: any) {
       setResponseState({
-        ...responseState,
-        error
-      });
-    });
+        loading: false,
+        error: error,
+        fetched: false
+      })
+    }
   }, [responseState, reservedImages]);
 
   async function modify() {};
@@ -127,9 +167,6 @@ export const useConvertedImage = (): DataController<ImageFileDto, ConvertedImage
 
 export const useStoredImage = (id?: string): DataController<ConvertedImageDto, StoredImageVO> => {
   const [responseState, setResponseState] = useRecoilState(StoredImageResponseState);
-
-  const [imageUrl, setImageUrl] = useState<string>("");
-  const [personId, setPersonId] = useState<number>(0);
 
   const init = useCallback(() => {
     if (!id) {
@@ -166,65 +203,7 @@ export const useStoredImage = (id?: string): DataController<ConvertedImageDto, S
     }
   }, []);
 
-  useEffect(() => {
-    if (!!imageUrl) {
-      addDoc(collection(firebaseDB, "images"), {
-        url: imageUrl,
-        created: serverTimestamp(),
-        personId: personId
-      })
-        .then((docRef) => {
-          setResponseState({
-            data: {
-              id: docRef.id,
-              url: imageUrl,
-              personId: personId
-            },
-            fetched: false,
-            loading: false
-          })
-        });
-    }
-  }, [imageUrl, personId]);
-
-  const uploadFile = useCallback(async (data: ConvertedImageDto) => {
-    const { base64Image, personId } = data;
-
-    const storageRef = ref(storage, `upload/${Date.now()}${base64Image.slice(1, 10)}.png`);
-
-    const metadata = {
-      contentType: 'image/jpeg',
-    }
-
-    const blob = base64ToBlob(base64Image);
-    const task = uploadBytesResumable(storageRef, blob, metadata);
-    task.on("state_changed",
-      (snapshot) => {},
-      (error) => {
-        setResponseState({
-          error,
-          data: undefined,
-          fetched: false,
-          loading: false
-        });
-      },
-      () => {
-        getDownloadURL(task.snapshot.ref).then((url) => {
-          setImageUrl(url);
-          setPersonId(personId);
-        });
-      });
-  }, []);
-
-  const add = useCallback(async (data: ConvertedImageDto) => {
-    setResponseState({
-      ...responseState,
-      loading: true,
-      fetched: false
-    });
-    uploadFile(data);
-  }, [imageUrl]);
-
+  async function add() {};
   async function modify() {};
   async function remove() {};
 

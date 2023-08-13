@@ -41,7 +41,37 @@ export interface StoredImageVO {
 export const StoredImageResponseState = atom<ResponseState<StoredImageVO>>({
   key: "atom/StoredImage",
   default: {
+    loading: false,
+    fetched: false
+  }
+});
+
+export enum ImageProgressStatus {
+  LOADING = "loading",
+  ERROR = "error",
+  SUCCESS = "success",
+  DONE = "done",
+  SEND = "send"
+}
+
+export interface ImageProgressVO {
+  readonly _id: string;
+  readonly status: ImageProgressStatus;
+  readonly imageUrl: string;
+  readonly worker?: string;
+}
+
+export const ImageProgressResponseState = atom<ResponseState<ImageProgressVO>>({
+  key: "atom/ImageProgress",
+  default: {
     loading: true,
     fetched: false
   }
 });
+
+/**
+ * id: firestore 내의 ImageProgress 데이터를 폴링 하기 위한 아이디 (ImageProgress id)
+ */
+export interface PollingContextVO {
+  id: string;
+}

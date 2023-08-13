@@ -127,8 +127,8 @@ export default function Landing() {
               descriptionClassName
             )}>이 프로젝트는 다음의 파트너들과 함께합니다</p>
           </div>
-          <div className="w-full flex justify-center">
-            <img src={getPublicUrl("/images/landing/donors.png")} alt="donors" />
+          <div className="w-full h-[150px] flex justify-center">
+            {/* <img src={getPublicUrl("/images/landing/donors.png")} alt="donors" /> */}
           </div>
         </section>
       </div>

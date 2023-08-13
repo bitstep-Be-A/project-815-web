@@ -1,10 +1,8 @@
 import { useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { useRecoilState } from "recoil";
 
-import { useConvertedImage, useStoredImage } from "../controllers/upload.controller";
+import { useProcessImage } from "../controllers/upload.controller";
 import { classNames } from "../utils";
-import { ImageFileDtoState } from "../data/upload/upload.dto";
 
 import Button from "../components/Button";
 import CachedIcon from '@mui/icons-material/Cached';
@@ -12,41 +10,23 @@ import CachedIcon from '@mui/icons-material/Cached';
 export default function Loading() {
   const navigate = useNavigate();
 
-  const { dataState: convertedImageDataState } = useConvertedImage();
-  const { dataState: storedImageDataState, add: storeImage } = useStoredImage();
-
-  const [imageFileDto, _] = useRecoilState(ImageFileDtoState);
+  const { dataState, init: cleanController } = useProcessImage();
 
   const isComplete = useMemo(() => {
-    return (
-      !convertedImageDataState.loading && !convertedImageDataState.error
-    ) && (
-      !storedImageDataState.loading && !storedImageDataState.error
-    );
-  }, [convertedImageDataState, storedImageDataState]);
+    return !dataState.loading && !dataState.error;
+  }, [dataState]);
 
   const isFailure = useMemo(() => {
-    return (
-      convertedImageDataState.error || storedImageDataState.error
-    );
-  }, [convertedImageDataState, storedImageDataState]);
-
-  useEffect(() => {
-    if (!convertedImageDataState.loading) {
-      convertedImageDataState.data &&
-        storeImage({
-          base64Image: convertedImageDataState.data.image,
-          personId: imageFileDto.personId
-        });
-    }
-  }, [convertedImageDataState, storeImage]);
+    return dataState.error;
+  }, [dataState]);
 
   useEffect(() => {
     if (isComplete) {
-      const imageId = storedImageDataState.data?.id;
+      const imageId = dataState.data?.id;
+      cleanController && cleanController();
       navigate(`/result/${imageId}`);
     }
-  }, [isComplete, storedImageDataState]);
+  }, [isComplete, dataState]);
 
   return (
     <>

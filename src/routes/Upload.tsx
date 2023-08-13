@@ -3,7 +3,7 @@ import { useRecoilState } from "recoil";
 
 import { RouterContext } from "../utils/router.util";
 import { ImageFileDtoState } from "../data/upload/upload.dto";
-import { useConvertedImage } from "../controllers/upload.controller";
+import { useProcessImage } from "../controllers/upload.controller";
 import {
   descriptionClassName,
   contentContainerClassName
@@ -50,7 +50,7 @@ export default function Upload() {
 
   const [imageFileDto, setImageFileDto] = useRecoilState(ImageFileDtoState);
 
-  const controller = useConvertedImage();
+  const controller = useProcessImage();
 
   const hiddenFileInputElement = useRef<HTMLInputElement>(null);
 
