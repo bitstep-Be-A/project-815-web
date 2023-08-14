@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState, useContext } from "react";
 import { useRecoilState } from "recoil";
-import { doc, getDoc, onSnapshot } from "firebase/firestore";
+import { doc, getDoc, onSnapshot, setDoc } from "firebase/firestore";
 import { ref, getDownloadURL, uploadBytes } from "firebase/storage";
 
 import { DataController } from "./types";
@@ -95,15 +95,27 @@ export const useProcessImage = (): DataController<ImageFileDto, StoredImageVO> =
           });
         }
         if (data.status === ImageProgressStatus.SUCCESS) {
-          setResponseState({
-            data: {
-              id: pollingContext.id,
-              url: data.imageUrl,
-              personId: pollingContext.personId,
-            },
-            loading: false,
-            fetched: false,
-          });
+          const storedImage: StoredImageVO = {
+            id: pollingContext.id,
+            url: data.imageUrl,
+            personId: pollingContext.personId,
+            created: Date.now()
+          }
+
+          setDoc(doc(firebaseDB, "images", pollingContext.id), storedImage)
+            .then(() => {
+              setResponseState({
+                data: storedImage,
+                loading: false,
+                fetched: false,
+              });
+            })
+            .catch((e) => setResponseState({
+              data: undefined,
+              loading: false,
+              fetched: false,
+              error: e
+            }));
         }
       }
     });

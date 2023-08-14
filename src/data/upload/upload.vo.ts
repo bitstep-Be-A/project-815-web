@@ -83,4 +83,4 @@ export const PollingContextVOState = atom<PollingContextVO>({
     id: "",
     personId: 0
   }
-})
+});
