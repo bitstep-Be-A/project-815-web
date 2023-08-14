@@ -133,11 +133,6 @@ export const useProcessImage = (): DataController<ImageFileDto, StoredImageVO> =
       loading: true
     });
 
-    setPollingContext({
-      ...pollingContext,
-      personId: data.personId
-    });
-    
     const tmp = reservedImages.filter(v => (v.personId === data.personId) && (v.gender === data.gender));
     if (tmp.length === 0) {
       throw new Error("reservedImage가 존재하지 않습니다.");
@@ -157,7 +152,7 @@ export const useProcessImage = (): DataController<ImageFileDto, StoredImageVO> =
       face_index: reservedImage.myPosition
     }).then((context) => {
       setPollingContext({
-        ...pollingContext,
+        personId: data.personId,
         id: context.id
       });
     }).catch((error) => {

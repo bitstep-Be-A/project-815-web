@@ -10,7 +10,7 @@ import CachedIcon from '@mui/icons-material/Cached';
 export default function Loading() {
   const navigate = useNavigate();
 
-  const { dataState, init: cleanController } = useProcessImage();
+  const { dataState } = useProcessImage();
 
   const isComplete = useMemo(() => {
     return !dataState.loading && !dataState.error;
@@ -23,7 +23,6 @@ export default function Loading() {
   useEffect(() => {
     if (isComplete) {
       const imageId = dataState.data?.id;
-      cleanController && cleanController();
       navigate(`/result/${imageId}`);
     }
   }, [isComplete, dataState]);
