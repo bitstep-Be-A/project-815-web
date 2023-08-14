@@ -24,6 +24,11 @@ export interface ConvertedImageDto {
   personId: number;
 }
 
+/**
+ * base_image - image url
+ * roop_image - image url
+ * face_index - 0 or 1
+ */
 export interface RoopImg2imgDto {
   base_image: string;
   roop_image: string;

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState, useContext } from "react";
 import { useRecoilState } from "recoil";
 import { doc, getDoc, onSnapshot } from "firebase/firestore";
-import { ref, getDownloadURL } from "firebase/storage";
+import { ref, getDownloadURL, uploadBytes } from "firebase/storage";
 
 import { DataController } from "./types";
 import {
@@ -11,12 +11,12 @@ import {
   StoredImageResponseState,
   ImageProgressVO,
   ImageProgressStatus,
+  PollingContextVOState,
 } from "../data/upload/upload.vo";
 import {
   ConvertedImageDto,
   ImageFileDto,
 } from "../data/upload/upload.dto";
-import { blobToBase64, sourceToBase64 } from "../utils/files.util";
 import { RouterContext } from "../utils/router.util";
 import { firebaseDB, storage } from "../api/firebase";
 import fetchPostImg2img from "../api/fetchPostImg2img";
@@ -59,8 +59,7 @@ export const useProcessImage = (): DataController<ImageFileDto, StoredImageVO> =
 
   const { items: reservedImages } = useReservedImages();
 
-  const [personId, setPersonId] = useState<number>(0);
-  const [imageProgressId, setImageProgressId] = useState<string | null>(null);
+  const [pollingContext, setPollingContext] = useRecoilState(PollingContextVOState);
 
   const init = useCallback(() => {
     setResponseState({
@@ -76,14 +75,14 @@ export const useProcessImage = (): DataController<ImageFileDto, StoredImageVO> =
       init();
     }
   }, [responseState, init]);
-
+  
   /**
    * polling image progress
    */
   useEffect(() => {
-    if (imageProgressId === null) return;
+    if (!pollingContext.id) return;
 
-    const docRef = doc(firebaseDB, "imageProgress", imageProgressId);
+    const docRef = doc(firebaseDB, "imageProgress", pollingContext.id);
 
     const unsubscribe = onSnapshot(docRef, (snapshot) => {
       const data = snapshot.data() as (ImageProgressVO | undefined);
@@ -98,9 +97,9 @@ export const useProcessImage = (): DataController<ImageFileDto, StoredImageVO> =
         if (data.status === ImageProgressStatus.SUCCESS) {
           setResponseState({
             data: {
-              id: imageProgressId,
+              id: pollingContext.id,
               url: data.imageUrl,
-              personId: personId,
+              personId: pollingContext.personId,
             },
             loading: false,
             fetched: false,
@@ -112,8 +111,8 @@ export const useProcessImage = (): DataController<ImageFileDto, StoredImageVO> =
     return () => {
       unsubscribe();
     };
-  }, [imageProgressId, personId]);
-  
+  }, [pollingContext]);
+
   const add = useCallback(async (data: ImageFileDto) => {
     if (!data.file) { throw new Error("File이 업로드되지 않았습니다.") }
 
@@ -122,7 +121,10 @@ export const useProcessImage = (): DataController<ImageFileDto, StoredImageVO> =
       loading: true
     });
 
-    setPersonId(data.personId);
+    setPollingContext({
+      ...pollingContext,
+      personId: data.personId
+    });
     
     const tmp = reservedImages.filter(v => (v.personId === data.personId) && (v.gender === data.gender));
     if (tmp.length === 0) {
@@ -130,27 +132,30 @@ export const useProcessImage = (): DataController<ImageFileDto, StoredImageVO> =
     }
     const reservedImage = tmp[Math.floor(Math.random() * tmp.length)];
 
-    const storageRef = ref(storage, reservedImage.imageUrl);
-    const sourceUrl = await getDownloadURL(storageRef);
+    const reservedImageRef = ref(storage, reservedImage.imageUrl);
+    const baseImageUrl = await getDownloadURL(reservedImageRef);
 
-    const initImage = await sourceToBase64(sourceUrl);
-    const roopImage = await blobToBase64(data.file);
+    const myImageRef = ref(storage, `my/${Date.now()}${data.file.name}`);
+    const myImageSnapshot = await uploadBytes(myImageRef, data.file, {contentType: 'image/jpeg'});
+    const roopImageUrl = await getDownloadURL(myImageSnapshot.ref);
 
-    try {
-      const context = await fetchPostImg2img({
-        base_image: initImage,
-        roop_image: roopImage,
-        face_index: reservedImage.myPosition
+    fetchPostImg2img({
+      base_image: baseImageUrl,
+      roop_image: roopImageUrl,
+      face_index: reservedImage.myPosition
+    }).then((context) => {
+      setPollingContext({
+        ...pollingContext,
+        id: context.id
       });
-      setImageProgressId(context.id);
-    } catch(error: any) {
+    }).catch((error) => {
       setResponseState({
         loading: false,
         error: error,
         fetched: false
-      })
-    }
-  }, [responseState, reservedImages]);
+      });
+    });
+  }, [responseState, reservedImages, pollingContext]);
 
   async function modify() {};
   async function remove() {};

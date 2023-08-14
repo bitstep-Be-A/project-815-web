@@ -74,4 +74,13 @@ export const ImageProgressResponseState = atom<ResponseState<ImageProgressVO>>({
  */
 export interface PollingContextVO {
   id: string;
+  personId: number;
 }
+
+export const PollingContextVOState = atom<PollingContextVO>({
+  key: "atom/PollingContext",
+  default: {
+    id: "",
+    personId: 0
+  }
+})
