@@ -104,7 +104,7 @@ code {
   z-index: -99;
 }
 
-@media (max-height: 550px) {
+@media (max-height: 430px) {
   img {
     display: none;
   }
