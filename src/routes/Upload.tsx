@@ -46,13 +46,27 @@ const SectionHeader = ({ sessionNum }: {sessionNum: number}) => {
 
 export default function Upload() {
   const router = useContext(RouterContext);
+
   const [sessionNum, setSessionNum] = useState<number>(1);
+  const [uploadActive, setUploadActive] = useState<boolean>(true);
 
   const [imageFileDto, setImageFileDto] = useRecoilState(ImageFileDtoState);
 
   const controller = useProcessImage();
 
   const hiddenFileInputElement = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!uploadActive) {
+      const timeoutId = setTimeout(() => {
+        setUploadActive(true);
+      }, 1000);
+
+      return () => {
+        clearTimeout(timeoutId);
+      };
+    }
+  }, [uploadActive])
 
   const handleFileDrop = useCallback((e?: React.DragEvent) => {
     e?.preventDefault();
@@ -68,6 +82,7 @@ export default function Upload() {
 
   const handleFileUploaderClick = (e?: React.MouseEvent) => {
     e?.stopPropagation();
+    setUploadActive(false);
     hiddenFileInputElement.current?.click();
   }
 
@@ -118,6 +133,7 @@ export default function Upload() {
           onDragOver={(e) => e?.preventDefault()}
           onDrop={(e) => handleFileDrop(e)}
           onClick={handleFileUploaderClick}
+          disabled={!uploadActive}
         >
           <img src={getPublicUrl('images/drive_folder_upload.png')} alt="file upload"/>
           <div className="text-center text-lg" style={{color: deepGray}}>
