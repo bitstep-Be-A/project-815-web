@@ -62,7 +62,7 @@ export default function Landing() {
         screenWidthClassName,
         "flex flex-col items-center h-full relative drop-shadow-xl bg-zinc-50"
       )}>
-        <DonationBanner/>
+        {/* <DonationBanner/> */}
         <section className="relative w-full min-h-[400px] h-[760px] sm:h-[900px]">
           <div className="behind absolute w-full h-[760px] sm:h-[900px]">
             <img src={getPublicUrl("/images/landing/baekdu.png")} alt="baekdu" className="w-full h-full" />
@@ -127,8 +127,8 @@ export default function Landing() {
               descriptionClassName
             )}>이 프로젝트는 다음의 파트너들과 함께합니다</p>
           </div>
-          <div className="w-full flex justify-center">
-            <img src={getPublicUrl("/images/landing/donors.png")} alt="donors" />
+          <div className="w-full h-[150px] flex justify-center">
+            {/* <img src={getPublicUrl("/images/landing/donors.png")} alt="donors" /> */}
           </div>
         </section>
       </div>

@@ -18,7 +18,7 @@
   {
     "personId": 2,
     "gender": "F",
-    "myPosition": 0,
+    "myPosition": 1,
     "labelNum": 0,
     "category": "real",
     "imageUrl": "/stable-diffusion/real/2-F-0-0.png"
@@ -50,7 +50,7 @@
   {
     "personId": 4,
     "gender": "F",
-    "myPosition": 0,
+    "myPosition": 1,
     "labelNum": 0,
     "category": "real",
     "imageUrl": "/stable-diffusion/real/4-F-0-0.png"
@@ -66,7 +66,7 @@
   {
     "personId": 5,
     "gender": "F",
-    "myPosition": 0,
+    "myPosition": 1,
     "labelNum": 0,
     "category": "real",
     "imageUrl": "/stable-diffusion/real/5-F-0-0.png"
@@ -82,7 +82,7 @@
   {
     "personId": 6,
     "gender": "F",
-    "myPosition": 0,
+    "myPosition": 1,
     "labelNum": 0,
     "category": "real",
     "imageUrl": "/stable-diffusion/real/6-F-0-0.png"
@@ -106,7 +106,7 @@
   {
     "personId": 22,
     "gender": "M",
-    "myPosition": 0,
+    "myPosition": 1,
     "labelNum": 0,
     "category": "real",
     "imageUrl": "/stable-diffusion/real/22-M-0-0.png"
